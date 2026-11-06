@@ -1,0 +1,24 @@
+{
+ "default": "remi",
+ "presenters": {
+  "remi": {
+   "name": "Remi",
+   "look": "bold clean cartoon woman, short curly hair, mustard-yellow sweater, gold studs; the free default presenter",
+   "hands": "drawn",
+   "best": "any topic; the default presenter in the free skill",
+   "layout": {
+    "short": {
+     "fw": 245,
+     "top": 1265,
+     "cx": 700
+    },
+    "long": {
+     "fw": 250,
+     "top": 430,
+     "cx": 1640
+    }
+   },
+   "handScale": 0.6
+  }
+ }
+}

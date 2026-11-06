@@ -1,0 +1,70 @@
+{
+ "id": "remi",
+ "noEdge": true,
+ "w": 707,
+ "h": 969,
+ "kind": "cartoon",
+ "pivot": [
+  357.8273014957747,
+  480.6846672796572
+ ],
+ "mouthRect": [
+  208,
+  385,
+  303,
+  171
+ ],
+ "eyeRect": [
+  220,
+  232,
+  261,
+  110
+ ],
+ "mouths": 11,
+ "eyes": [
+  "e_open_up",
+  "e_half_n",
+  "e_half_up",
+  "e_shut_n",
+  "e_shut_up"
+ ],
+ "skin": "#cc642f",
+ "face": {
+  "cx": 357.8273014957747,
+  "top": 238.54376855492592,
+  "chin": 461.6335111580353,
+  "width": 238.13945152027435
+ },
+ "gestures": {
+  "pad": 480,
+  "map": {
+   "point": "pointing",
+   "pointdown": "pointing",
+   "palm": "palm",
+   "both": "both",
+   "stop": "both",
+   "shrug": "shrug",
+   "yes": "thumbs",
+   "think": "think",
+   "eyes": "palm",
+   "mouth": "palm",
+   "finger": "finger",
+   "thumbs": "thumbs",
+   "fists": "fists"
+  }
+ },
+ "expressions": {
+  "rect": [
+   224,
+   206,
+   266,
+   190
+  ],
+  "names": [
+   "surprised",
+   "skeptical",
+   "laughing"
+  ]
+ },
+ "drawnMouths": true
+}
