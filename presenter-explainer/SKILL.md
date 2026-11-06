@@ -98,4 +98,4 @@ Tell the user the file path, length, mix level and anything you couldn't check. 
 - A `contrast` error on a caption word (a `span` in the captions) is the check catching a word during its 0.2 s turn from grey to ink. It is not a real problem. Every other error must be fixed.
 - Tested on macOS. Building your own presenter is not part of this free version.
 
-Made by Chris Ife. Help, new presenters and more skills: Creator Point on Skool.
+Made by Chris Ife. Help, new presenters and more skills: Chris Ife Studio on Skool.

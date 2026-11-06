@@ -4,9 +4,9 @@ Make explainer videos with a talking cartoon presenter, from a script and a voic
 
 You record your script on your phone. Your coding agent (Claude Code or Codex) times every word, plans the scenes, animates the presenter so her mouth moves on every word, adds props, captions, sound and music, checks its own work and renders an MP4. It makes YouTube videos (16:9) and Shorts, Reels and TikToks (9:16).
 
-This is the same skill I use for the Chris Ife Show, with a free presenter called **Remi**.
+This is the same skill I use for my YouTube channel, Chris Ife Studio, with a free presenter called **Remi**.
 
-**Setup guide, help and new presenters: Creator Point on Skool.** _(link)_
+**Setup guide, help and new presenters: Chris Ife Studio on Skool.** _(link)_
 
 ## What you need
 
