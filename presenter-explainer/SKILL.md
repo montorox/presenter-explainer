@@ -50,7 +50,7 @@ The user records the script on their phone or computer and gives you the file.
 ```bash
 .venv/bin/python $T/voice.py import --project projects/<slug> --audio <file> --format short
 ```
-It writes the time of every word, trims long pauses for the format and compares the voice with the script. Read back any "script and voice differ" lines and tell the user. With no script.txt it writes one from what it heard. Never change the speed of the user's voice. `--pauses off` leaves their pauses alone; `--pauses 0.4` sets another cap.
+It writes the time of every word, trims long pauses for the format and compares the voice with the script. Read back any "script and voice differ" lines and tell the user. A `heard extra ... at A-B s` line is usually a retake (the user said a line again after a mistake): remove it by adding `{"cutTime":[[A,B]]}` to `projects/<slug>/edits.json` (add to the list if the file exists), run `.venv/bin/python $T/voice.py edit --project projects/<slug>`, and tell the user which words you cut. Members are told they can simply say a line again, so always do this. With no script.txt it writes one from what it heard. Never change the speed of the user's voice. `--pauses off` leaves their pauses alone; `--pauses 0.4` sets another cap.
 
 ## 4. Plan the scenes
 Write `projects/<slug>/plan.json` (and `demos.js` for custom demos). Read `references/plan.md` first.
