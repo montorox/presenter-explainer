@@ -8,7 +8,7 @@ description: Make an explainer video with a talking cartoon presenter (Remi) fro
 **The one rule: the picture acts out what the voice says, on the word.** A nice card that doesn't match the line is a failed scene. Every caption, title, stamp and gesture starts on a real word's start time, never a guess.
 
 Studio: `~/PresenterStudio`, each video in `projects/<slug>/`. Tools are in this skill's `tools/`. If `~/PresenterStudio/.venv` is missing, run this skill's `setup.sh` first.
-Python: `~/PresenterStudio/.venv/bin/python`. Below, `$T` = this skill's `tools` folder. Run everything from the studio folder.
+Python: `~/PresenterStudio/.venv/bin/python` (on Windows in PowerShell: `.venv\Scripts\python.exe`; in Git Bash `.venv/bin/python` works). Below, `$T` = this skill's `tools` folder. Run everything from the studio folder.
 Talk to the user in plain language. Give one recommendation and why. Say honestly what you did not check. You can't hear audio: say so, and use the reports.
 
 ## 1. Settle these first
@@ -83,7 +83,7 @@ Look at the sheet. Check: nothing covers the presenter's face, captions don't ru
 node $T/build.mjs projects/<slug> --preview              # fast draft for the user. Long form: add --to 60 first
 node $T/build.mjs projects/<slug>                        # final: out/<slug>.mp4
 ```
-- Rendering runs at about real time on a recent Mac. Temp files go to `~/Library/Caches/presenter-explainer/<slug>` and are deleted after.
+- Rendering runs at about real time on a recent Mac. Temp files go to the system cache folder (`~/Library/Caches` on Mac, `%LOCALAPPDATA%` on Windows) under `presenter-explainer/<slug>` and are deleted after.
 - The final render prints how many moments stood still for over 1 s. It must be 0.
 - Mix: voice, a quiet original music bed, synthesised sound effects, -14 LUFS. Re-run `--prep` then `sound.py mix` whenever the plan changes.
 

@@ -26,11 +26,11 @@ Downloaded the files instead? Drag the folder or the zip into your agent and say
 
 What you need:
 
-- A Mac (this is what it's tested on; Windows isn't tested yet)
+- A Mac or a Windows PC (Windows support is new: post in Help on Skool if anything goes wrong)
 - Claude Code or Codex
 - Node 22 or newer: https://nodejs.org
-- FFmpeg: `brew install ffmpeg`
-- uv (for Python): `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- FFmpeg: Mac `brew install ffmpeg`, Windows `winget install Gyan.FFmpeg`
+- uv (for Python): Mac `curl -LsSf https://astral.sh/uv/install.sh | sh`, Windows `winget install astral-sh.uv`
 - Google Chrome, only if you want real web pages in your videos
 
 1. Download this repo:
@@ -54,7 +54,7 @@ What you need:
 3. Build the studio (once, takes a few minutes):
 
    ```bash
-   zsh ~/.claude/skills/presenter-explainer/setup.sh
+   bash ~/.claude/skills/presenter-explainer/setup.sh
    ```
    (Use `~/.codex/skills/...` if you installed it for Codex.) It creates `~/PresenterStudio`, where your videos live.
 
@@ -96,14 +96,15 @@ Things you can say along the way:
 If a user asked you to install this, follow these steps in order. Tell the user what you're doing in plain words.
 
 1. **Get the files.** If you only have this page, run `git clone https://github.com/montorox/presenter-explainer.git` into a temporary folder. If the user gave you a zip or folder, unzip it and find the folder that contains `presenter-explainer/SKILL.md`.
-2. **Check the computer.** This is tested on macOS. On Windows, tell the user it isn't tested yet, offer to try it with WSL (Ubuntu), and ask before going on.
+2. **Check the computer.** It runs on macOS and Windows. On Windows, run every command in Git Bash (install Git for Windows with `winget install Git.Git` if it's missing; Claude Code on Windows already uses it). Windows support is new: if a step fails, fix what you can and tell the user exactly what went wrong.
 3. **Install what's missing**, asking the user before each install:
-   - Node 22 or newer (`node -v`). If missing: `brew install node`, or https://nodejs.org.
-   - FFmpeg (`ffmpeg -version`). If missing: `brew install ffmpeg`. No Homebrew? Ask the user before installing it from https://brew.sh.
-   - uv (`uv --version`). If missing: `curl -LsSf https://astral.sh/uv/install.sh | sh`, then open a new shell or add `~/.local/bin` to PATH.
+   - Node 22 or newer (`node -v`). Mac: `brew install node`. Windows: `winget install OpenJS.NodeJS.LTS`.
+   - FFmpeg (`ffmpeg -version`). Mac: `brew install ffmpeg` (no Homebrew? ask before installing it from https://brew.sh). Windows: `winget install Gyan.FFmpeg`.
+   - uv (`uv --version`). Mac: `curl -LsSf https://astral.sh/uv/install.sh | sh`. Windows: `winget install astral-sh.uv`.
+   - After installing on Windows, open a new terminal so the new tools are on PATH.
 4. **Copy the skill folder.** Claude Code: copy `presenter-explainer/presenter-explainer` to `~/.claude/skills/presenter-explainer`. Codex: to `~/.codex/skills/presenter-explainer`. If one is already there, replace it; never touch `~/PresenterStudio`, which holds the user's videos.
-5. **Build the studio:** `zsh <skills folder>/presenter-explainer/setup.sh`. It installs into `~/PresenterStudio` only and ends with `ready: ...`. If it stops with a message about a missing tool, install that tool (ask first) and run it again. It is safe to re-run.
-6. **Check it worked:** `ls ~/PresenterStudio/.venv ~/PresenterStudio/node_modules/hyperframes`, both should exist.
+5. **Build the studio:** `bash <skills folder>/presenter-explainer/setup.sh`. It installs into `~/PresenterStudio` only and ends with `ready: ...`. If it stops with a message about a missing tool, install that tool (ask first) and run it again. It is safe to re-run.
+6. **Check it worked:** `ls ~/PresenterStudio/.venv ~/PresenterStudio/node_modules/hyperframes`, both should exist. On Windows also check `~/PresenterStudio/.venv/bin/python --version` works.
 7. **Finish:** tell the user to restart their agent, then try: "Make a 30-second test Short with Remi about why the sky is blue. Write the script first."
 
 ## Licence

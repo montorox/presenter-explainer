@@ -9,7 +9,12 @@ const puppeteer = createRequire(path.join(STUDIO, 'package.json'))('puppeteer-co
 const a = process.argv, only = a.includes('--only') ? a[a.indexOf('--only') + 1].split(',') : null;
 const spec = JSON.parse(fs.readFileSync(path.join(P, 'pages.json'))), outD = path.join(P, 'pages'); fs.mkdirSync(outD, { recursive: true });
 const dataF = path.join(P, 'pages.data.json'), data = fs.existsSync(dataF) ? JSON.parse(fs.readFileSync(dataF)) : {};
-const browser = await puppeteer.launch({ executablePath: process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: 'new', args: ['--hide-scrollbars', '--disable-gpu'] });
+const findChrome = () => process.env.CHROME_PATH || ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  'C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+  path.join(process.env.LOCALAPPDATA || '', 'Google/Chrome/Application/chrome.exe'),
+  '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser'].find(p => fs.existsSync(p));
+if (!findChrome()) { console.error('Google Chrome not found. Install it, or set CHROME_PATH.'); process.exit(1); }
+const browser = await puppeteer.launch({ executablePath: findChrome(), headless: 'new', args: ['--hide-scrollbars', '--disable-gpu'] });
 let bad = 0;
 for (const s of spec) {
   if (only && !only.includes(s.id)) continue;

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* Assemble and render.   node build.mjs <project> [--check] [--still t1,t2] [--preview] [--from s --to s] [--chunk 60] [--workers 6] [--out file]
-   Long videos render in chunks to ~/Library/Caches/presenter-explainer/<project>, then join and mux with the mix. Temp is deleted after. Finished chunks are reused on a re-run. */
-import fs from 'fs'; import path from 'path'; import os from 'os'; import { execFileSync, spawnSync } from 'child_process'; import { fileURLToPath } from 'url';
+   Long videos render in chunks to the system cache folder (presenter-explainer/<project>), then join and mux with the mix. Temp is deleted after. Finished chunks are reused on a re-run. */
+import fs from 'fs'; import path from 'path'; import os from 'os'; import { execFileSync, spawnSync } from 'child_process'; import { fileURLToPath, pathToFileURL } from 'url';
 const HERE = path.dirname(fileURLToPath(import.meta.url)), SKILL = path.dirname(HERE), STUDIO = path.join(os.homedir(), 'PresenterStudio');
 const args = process.argv.slice(2), P = path.resolve(args[0]); const opt = (k, d) => { const i = args.indexOf('--' + k); return i < 0 ? d : (args[i + 1] && !args[i + 1].startsWith('--') ? args[i + 1] : true); };
 const slug = path.basename(P), B = path.join(P, 'build'), plan = JSON.parse(fs.readFileSync(path.join(P, 'plan.json'))); if (opt('presenter')) plan.presenter = opt('presenter');
@@ -19,10 +19,10 @@ fs.writeFileSync(path.join(B, 'data.js'), 'window.MX_DATA=' + JSON.stringify({ p
 fs.writeFileSync(path.join(B, 'chunk.js'), '');
 fs.writeFileSync(path.join(B, '.hyperframesignore'), 'cues.json\n');
 
-const hf = (...a) => spawnSync('npx', ['hyperframes', ...a], { cwd: STUDIO, encoding: 'utf8', maxBuffer: 1 << 28 });
-const chrome = hf('browser', 'path').stdout.trim().split('\n').pop();
+const hf = (...a) => spawnSync(process.execPath, [path.join(STUDIO, 'node_modules/hyperframes/bin/hyperframes.mjs'), ...a], { cwd: STUDIO, encoding: 'utf8', maxBuffer: 1 << 28 });
+const chrome = hf('browser', 'path').stdout.trim().split('\n').pop().trim();
 // a run with every scene built, to collect sound cues and catch bad word anchors
-const dump = spawnSync(chrome, ['--headless', '--disable-gpu', '--allow-file-access-from-files', '--virtual-time-budget=8000', '--dump-dom', `file://${B}/index.html?cues=1`], { encoding: 'utf8', maxBuffer: 1 << 29 });
+const dump = spawnSync(chrome, ['--headless', '--disable-gpu', '--allow-file-access-from-files', '--virtual-time-budget=8000', '--dump-dom', pathToFileURL(path.join(B, 'index.html')).href + '?cues=1'], { encoding: 'utf8', maxBuffer: 1 << 29 });
 const m = dump.stdout.match(/<pre id="mxcues"[^>]*>([\s\S]*?)<\/pre>/); if (!m || !m[1]) { console.error('page did not build\n' + dump.stderr.slice(-1500)); process.exit(1); }
 const { cues, errors } = JSON.parse(m[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>'));
 fs.writeFileSync(path.join(B, 'cues.json'), JSON.stringify(cues)); fs.writeFileSync(path.join(P, 'cues.json'), JSON.stringify(cues, null, 0));
@@ -35,18 +35,20 @@ if (opt('still')) {
   if (r.status) console.log(r.stdout.slice(-800), r.stderr.slice(-800));
   const sn = path.join(B, '.hyperframes/artifacts/snapshots'), latest = fs.readdirSync(sn).map(d => path.join(sn, d)).sort((x, y) => fs.statSync(y).mtimeMs - fs.statSync(x).mtimeMs)[0];
   const files = fs.readdirSync(latest).filter(f => f.endsWith('.png')).sort(); files.forEach(f => fs.copyFileSync(path.join(latest, f), path.join(outd, f)));
-  const cols = short ? 5 : 3; spawnSync('ffmpeg', ['-y', '-v', 'error', '-pattern_type', 'glob', '-i', path.join(outd, 'frame-*.png'), '-vf', `scale=${short ? 400 : 640}:-1,tile=${cols}x${Math.ceil(files.length / cols)}:padding=6`, '-frames:v', '1', path.join(outd, 'sheet.png')]);
+  const cols = short ? 5 : 3; const seq = path.join(outd, '_seq'); fs.mkdirSync(seq); files.forEach((f, i) => fs.copyFileSync(path.join(outd, f), path.join(seq, String(i).padStart(3, '0') + '.png')));
+  spawnSync('ffmpeg', ['-y', '-v', 'error', '-i', path.join(seq, '%03d.png'), '-vf', `scale=${short ? 400 : 640}:-1,tile=${cols}x${Math.ceil(files.length / cols)}:padding=6`, '-frames:v', '1', path.join(outd, 'sheet.png')]); fs.rmSync(seq, { recursive: true, force: true });
   console.log('stills:', path.join(outd, 'sheet.png')); process.exit(0);
 }
 // chunks
 const from = +opt('from', 0), to = +opt('to', dur), size = +opt('chunk', 60), workers = String(opt('workers', 6)), q = opt('preview') ? 'draft' : 'looks';
-const cache = path.join(os.homedir(), 'Library/Caches/presenter-explainer', slug + (opt('preview') ? '-p' : '')); fs.mkdirSync(cache, { recursive: true });
+const cacheRoot = process.platform === 'darwin' ? path.join(os.homedir(), 'Library/Caches') : process.platform === 'win32' ? (process.env.LOCALAPPDATA || os.tmpdir()) : path.join(os.homedir(), '.cache');
+const cache = path.join(cacheRoot, 'presenter-explainer', slug + (opt('preview') ? '-p' : '')); fs.mkdirSync(cache, { recursive: true });
 const spans = []; for (let a = from; a < to - .001; a += size) spans.push([+a.toFixed(3), +Math.min(a + size, to).toFixed(3)]);
 const parts = []; const t00 = Date.now();
 for (const [a, b] of spans) {
   const f = path.join(cache, `c_${String(a).padStart(8, '0')}_${b}.mp4`); parts.push(f);
   fs.writeFileSync(path.join(B, 'chunk.js'), `window.MX_DATA.chunk={a:${a},b:${b}};`);
-  const r = spawnSync('npx', ['hyperframes', 'render', B, '--quiet', '-o', f, '-q', q, '-w', workers, '--start', String(a), '--end', String(b)], { cwd: STUDIO, encoding: 'utf8', maxBuffer: 1 << 28 });
+  const r = spawnSync(process.execPath, [path.join(STUDIO, 'node_modules/hyperframes/bin/hyperframes.mjs'), 'render', B, '--quiet', '-o', f, '-q', q, '-w', workers, '--start', String(a), '--end', String(b)], { cwd: STUDIO, encoding: 'utf8', maxBuffer: 1 << 28 });
   if (r.status !== 0 || !fs.existsSync(f)) { console.error('render failed at', a, (r.stderr || r.stdout).slice(-1500)); process.exit(1); }
   console.log(`rendered ${a}-${b}s (${((Date.now() - t00) / 1000).toFixed(0)}s so far)`);
 }
