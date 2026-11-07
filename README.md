@@ -6,18 +6,32 @@ You record your script on your phone. Your coding agent (Claude Code or Codex) t
 
 This is the same skill I use for my YouTube channel, Chris Ife Studio, with a free presenter called **Remi**.
 
-**Setup guide, help and new presenters: Chris Ife Studio on Skool.** _(link)_
+**Setup guide, help and new presenters: Chris Ife Studio on Skool:** https://www.skool.com/chris-ife-studio-6145
 
-## What you need
+## Install
 
-- A Mac (this is what it's tested on)
+### The easy way: ask your agent
+
+Open Claude Code or Codex and paste this:
+
+> Read https://github.com/montorox/presenter-explainer and install the skill for me. Set up anything that's missing.
+
+Your agent reads this page, installs what's missing (it asks first), sets up the studio and checks it works. It takes about 10 minutes. Restart your agent when it's done.
+
+Downloaded the files instead? Drag the folder or the zip into your agent and say:
+
+> Read the README in this and install the skill for me. Set up anything that's missing.
+
+### The manual way
+
+What you need:
+
+- A Mac (this is what it's tested on; Windows isn't tested yet)
 - Claude Code or Codex
 - Node 22 or newer: https://nodejs.org
 - FFmpeg: `brew install ffmpeg`
 - uv (for Python): `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - Google Chrome, only if you want real web pages in your videos
-
-## Install
 
 1. Download this repo:
 
@@ -76,6 +90,21 @@ Things you can say along the way:
 - Check every number before you record.
 - Record in a quiet room. Your phone is fine.
 - Listen to the final video before you post it. The agent can't hear audio.
+
+## For AI agents: how to install this skill
+
+If a user asked you to install this, follow these steps in order. Tell the user what you're doing in plain words.
+
+1. **Get the files.** If you only have this page, run `git clone https://github.com/montorox/presenter-explainer.git` into a temporary folder. If the user gave you a zip or folder, unzip it and find the folder that contains `presenter-explainer/SKILL.md`.
+2. **Check the computer.** This is tested on macOS. On Windows, tell the user it isn't tested yet, offer to try it with WSL (Ubuntu), and ask before going on.
+3. **Install what's missing**, asking the user before each install:
+   - Node 22 or newer (`node -v`). If missing: `brew install node`, or https://nodejs.org.
+   - FFmpeg (`ffmpeg -version`). If missing: `brew install ffmpeg`. No Homebrew? Ask the user before installing it from https://brew.sh.
+   - uv (`uv --version`). If missing: `curl -LsSf https://astral.sh/uv/install.sh | sh`, then open a new shell or add `~/.local/bin` to PATH.
+4. **Copy the skill folder.** Claude Code: copy `presenter-explainer/presenter-explainer` to `~/.claude/skills/presenter-explainer`. Codex: to `~/.codex/skills/presenter-explainer`. If one is already there, replace it; never touch `~/PresenterStudio`, which holds the user's videos.
+5. **Build the studio:** `zsh <skills folder>/presenter-explainer/setup.sh`. It installs into `~/PresenterStudio` only and ends with `ready: ...`. If it stops with a message about a missing tool, install that tool (ask first) and run it again. It is safe to re-run.
+6. **Check it worked:** `ls ~/PresenterStudio/.venv ~/PresenterStudio/node_modules/hyperframes`, both should exist.
+7. **Finish:** tell the user to restart their agent, then try: "Make a 30-second test Short with Remi about why the sky is blue. Write the script first."
 
 ## Licence
 
